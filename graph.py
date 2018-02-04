@@ -10,16 +10,14 @@ import networkx as nx
 import pandas as pd
 import random
 
-"""Creates dummy data of 5000 or so names taken from list online"""
-names = list(set(list(pd.read_csv('names.csv')['firstname'])))[0:5]
+names = list(pd.read_csv('ripple.csv')['author'])
 
 """Initializes graph"""
 G = nx.Graph()
 
-for i in range(10):
-    """Creates graph with 10,000 edges"""
+for i in range(len(names)*300):
     G.add_edge(names[random.randint(0,len(names)-1)], names[random.randint(0,len(names)-1)])
-nx.draw(G)
+    
 """implements pagerank"""
 ranks = nx.pagerank(G)
 
@@ -34,6 +32,5 @@ def get_rank(name, rank_dict):
         return 0
     
 df['score'] = list(map(lambda x: get_rank(x, ranks), list(df.names)))
-
-"""Sorts high to low"""
+df.score = df.score*100
 df.sort_values(['score'], ascending = 0)

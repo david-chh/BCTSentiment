@@ -1,49 +1,80 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-bitcoin_parser
+Scrape most recent articles
+
 @author: ethanweber
 """
 
-
 import urllib3
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+import random
 import os
 import pprint
 import re
+import pandas as pd
 
+#driver = webdriver.Chrome('/chromedriver') 
 
-#driver = webdriver.Chrome('/Users/ethanweber/Downloads/chromedriver') 
+file = 'ripple_data.htm'
 
-bitcoin_file = 'bitcoin_data.htm'
-ethereum_file = 'ethereum_data.htm'
-ripple_file = 'ripple_data.htm'
-test = "steemit_test.htm"
-
-#bitcoin = BeautifulSoup(open(bitcoin_file), "html.parser")
-ethereum = BeautifulSoup(open(ethereum_file), "html.parser")
-#ripple = BeautifulSoup(open(ripple_file), "html.parser")
+soup = BeautifulSoup(open(file), "html.parser")
 
 def parse_for_author(html_thing, number):
     try:
-        return html_thing.find_all(attrs="author")[number].a['href'].split("/@",1)[1]
+        author = html_thing.find_all(attrs="author")[number].a['href'].split("/@",1)[1]
+        return author
     except:
         return "escape"
+    
+def parse_for_url(html_thing, number):
+    try:
+        url = 'https://steemit.com/cryptocurrency/@' + bitcoin.find_all(attrs="articles__h2 entry-title")[5].a['href'].split("/@",1)[1]
+        return url
+    except:
+        return ""
+
 
 def get_authors(soup):
-    author_list = []
+    author_list = {}
     author_no = 0
     author = ""
     while author != 'escape':
         author = parse_for_author(soup, author_no)
+        url = parse_for_url(soup, author_no)
         author_no += 1
-        author_list.append(author)
+        author_list[author] = url
     return author_list
 
-ethereum_authors = get_authors(ethereum)
+
+
+author_url = get_authors(soup)
 df = pd.DataFrame()
-df['coin'] = 'ethereum'
-df['author'] = pd.Series(ethereum_authors)
-df.to_csv('ethereum.csv')
+df['coin'] = 'ripple.csv'
+df['author'] = pd.Series(authors[0])
+df['url'] =  pd.Series(urls[1])
+df['follows'] = random.sample(authors, random.sample(range(500), 1)[0])
+
+"""Initializes graph"""
+G = nx.Graph()
+
+for follower in df.author:
+    for followed in df[df.author == author]:
+        G.add_edge(follower, followed)
+
+ranks = nx.pagerank(G)
+
+def get_rank(name, rank_dict):
+    try:
+        return rank_dict[name]
+    except:
+        return 0
+
+df['score'] = list(map(lambda x: get_rank(x, ranks), list(df.author)))
+
+df.loc['coin', 'author', 'rank', 'url'].to_csv('final.csv')
+
+
+
+
+
