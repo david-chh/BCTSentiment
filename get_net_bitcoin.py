@@ -17,9 +17,8 @@ import networkx as nx
 
 
 #driver = webdriver.Chrome('/chromedriver') 
-
+"""static file used for reproducability"""
 file = 'bitcoin_data.htm'
-
 soup = BeautifulSoup(open(file), "html.parser")
 
 def parse_for_author(html_thing, number):
@@ -57,6 +56,7 @@ df['coin'] = ['ripple']*len(list(authors_dict.keys()))
 df['author'] = pd.Series(list(authors_dict.keys()))
 df['url'] =  pd.Series(list(map(lambda x: authors_dict[x], authors_dict.keys())))
 authors = list((authors_dict.keys()))
+"""Hacked dummy data - problem with ajax request & selenium"""
 connections = []
 for i in range(len(authors)):
     connections.append(random.sample(authors, random.sample(range(len(authors)- 100), 1)[0]))
