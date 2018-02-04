@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Scrape most recent articles
+Get authors, get followers, analyze as network using networkx.
+
+This system can be scaled through implementation with scrapy and neo4j.
+
+Beautiful soup and networkx used to push a prototype.
 
 @author: ethanweber
 """
