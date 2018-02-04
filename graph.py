@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Feb  3 15:36:30 2018
+Load graph, rank influential people.
 
 @author: ethanweber
 """
