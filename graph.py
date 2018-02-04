@@ -11,15 +11,15 @@ import pandas as pd
 import random
 
 """Creates dummy data of 5000 or so names taken from list online"""
-names = list(set(list(pd.read_csv('names.csv')['firstname'])))
+names = list(set(list(pd.read_csv('names.csv')['firstname'])))[0:5]
 
 """Initializes graph"""
 G = nx.Graph()
 
-for i in range(10000):
-    """"Creates graph with 10,000 edges""""
+for i in range(10):
+    """Creates graph with 10,000 edges"""
     G.add_edge(names[random.randint(0,len(names)-1)], names[random.randint(0,len(names)-1)])
-
+nx.draw(G)
 """implements pagerank"""
 ranks = nx.pagerank(G)
 
