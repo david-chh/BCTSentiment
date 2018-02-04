@@ -13,10 +13,12 @@ import os
 import pprint
 import re
 import pandas as pd
+import networkx as nx
+
 
 #driver = webdriver.Chrome('/chromedriver') 
 
-file = 'ripple_data.htm'
+file = 'bitcoin_data.htm'
 
 soup = BeautifulSoup(open(file), "html.parser")
 
@@ -29,11 +31,12 @@ def parse_for_author(html_thing, number):
     
 def parse_for_url(html_thing, number):
     try:
-        url = 'https://steemit.com/cryptocurrency/@' + bitcoin.find_all(attrs="articles__h2 entry-title")[5].a['href'].split("/@",1)[1]
+        url = soup.find_all(attrs="articles__h2 entry-title")[number].a['href']
         return url
     except:
         return ""
-
+    
+parse_for_url(soup, 5)
 
 def get_authors(soup):
     author_list = {}
@@ -48,19 +51,23 @@ def get_authors(soup):
 
 
 
-author_url = get_authors(soup)
+authors_dict = get_authors(soup)
 df = pd.DataFrame()
-df['coin'] = 'ripple.csv'
-df['author'] = pd.Series(authors[0])
-df['url'] =  pd.Series(urls[1])
-df['follows'] = random.sample(authors, random.sample(range(500), 1)[0])
+df['coin'] = ['ripple']*len(list(authors_dict.keys()))
+df['author'] = pd.Series(list(authors_dict.keys()))
+df['url'] =  pd.Series(list(map(lambda x: authors_dict[x], authors_dict.keys())))
+authors = list((authors_dict.keys()))
+connections = []
+for i in range(len(authors)):
+    connections.append(random.sample(authors, random.sample(range(len(authors)- 100), 1)[0]))
+df['follows'] = pd.Series(connections)
 
 """Initializes graph"""
 G = nx.Graph()
 
-for follower in df.author:
-    for followed in df[df.author == author]:
-        G.add_edge(follower, followed)
+for i in range(len(df.author)):
+    for j in range(len(df.iloc[i].follows)):
+            G.add_edge(df.author[i], df.iloc[i].follows[j])
 
 ranks = nx.pagerank(G)
 
@@ -71,10 +78,9 @@ def get_rank(name, rank_dict):
         return 0
 
 df['score'] = list(map(lambda x: get_rank(x, ranks), list(df.author)))
+df.score = df.score*20000
 
-df.loc['coin', 'author', 'rank', 'url'].to_csv('final.csv')
+df = df.sort_values(['score'], ascending = 0)
 
-
-
-
+df.loc[:,['coin', 'author', 'score', 'url']].to_csv('bitcoin_rankings.csv')
 
